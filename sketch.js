@@ -17,6 +17,22 @@ function randColor() {
     return color(random(255), random(255), random(255));
 }
 
+var calcRectDimension = function() {
+    if (this.selected) {
+        if (this.age < 300) {
+            this.lastSize = 0;
+            return 0;
+        } else if (this.lastSize < 10) {
+            this.lastSize = (this.age - 300)/20;
+            return (this.age - 300)/20;
+        } else {
+            return this.lastSize;
+        }
+    } else {
+        return this.lastSize;
+    }
+}
+
 function drawSlice(u) {
     u.circles.forEach(function(circ) {
         fill(circ.c);
@@ -63,8 +79,14 @@ function mouseReleased() {
     umbrellas.forEach(function(u) {
         if (u.selected) {
             u.selected = false;
+            u.rectangles.forEach(function(rectangle) {
+                rectangle.selected = false;
+            });
+            u.circles.forEach(function(circle) {
+                circle.selected = false;
+            });
         }
-    })
+    });
 }
 
 function draw() {
@@ -77,30 +99,18 @@ function draw() {
                     age: 0,
                     dist: u.d,
                     d: 15,
-                    c: randColor()
+                    c: randColor(),
+                    selected: true
                 })
             }
             if (u.d % 30 === 0) {
                 u.rectangles.push({
                     age: 0,
                     dist: u.d,
-                    w: function() {
-                        if (this.age < 100) {
-                            return 0;
-                        }
-                        else {
-                            return 50;
-                        }
-                    },
-                    h: function() {
-                        if (this.age < 300) {
-                            return 0;
-                        }
-                        else {
-                            return this.age/2;
-                        }
-                    },
-                    c: randColor()
+                    w: calcRectDimension,
+                    h: calcRectDimension,
+                    c: randColor(),
+                    selected: true
                 })
             }
         }
