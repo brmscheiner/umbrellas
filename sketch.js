@@ -1,6 +1,6 @@
 var umbrellas = [];
 var gr = 2; // growth rate 
-var slices = 20; // the number of symmetric slices in each mandala 
+var slices = 5; // the number of symmetric slices in each mandala 
 var bg = [100,100,100];
 
 function setup() {        
@@ -10,6 +10,7 @@ function setup() {
      frameRate(50);
      background(bg);
      fill(100,100,100);  
+     rectMode(CENTER);
 }
 
 function randColor() {
@@ -17,10 +18,19 @@ function randColor() {
 }
 
 function drawSlice(u) {
-    u.innercircles.forEach(function(circ) {
+    u.circles.forEach(function(circ) {
         fill(circ.c);
         ellipse(0.5 * (u.d - circ.dist), 0, circ.d);
+        circ.age += 1;
     })
+    push()
+    rotate(PI / slices)
+    u.rectangles.forEach(function(rectangle) {
+        fill(rectangle.c);
+        rect(0.5 * (u.d - rectangle.dist), 0, rectangle.w(), rectangle.h());
+        rectangle.age += 1;
+    })
+    pop()
 }
 
 function drawUmbrella(u) {
@@ -43,7 +53,8 @@ function mousePressed() {
         y: mouseY,
         d: 0,
         c: randColor(),
-        innercircles: [],
+        circles: [],
+        rectangles: [],
         selected: true
     });
 }
@@ -62,9 +73,33 @@ function draw() {
         if (u.selected) {
             u.d += gr;
             if (u.d % 50 === 0) {
-                u.innercircles.push({
+                u.circles.push({
+                    age: 0,
                     dist: u.d,
                     d: 15,
+                    c: randColor()
+                })
+            }
+            if (u.d % 30 === 0) {
+                u.rectangles.push({
+                    age: 0,
+                    dist: u.d,
+                    w: function() {
+                        if (this.age < 100) {
+                            return 0;
+                        }
+                        else {
+                            return 50;
+                        }
+                    },
+                    h: function() {
+                        if (this.age < 300) {
+                            return 0;
+                        }
+                        else {
+                            return this.age/2;
+                        }
+                    },
                     c: randColor()
                 })
             }
