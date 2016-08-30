@@ -1,8 +1,12 @@
 var umbrellas = [];
-var gr = 2; // growth rate 
-var slices = 5; // the number of symmetric slices in each mandala 
-var bg = [100,100,100];
+var growth_rate = 2; 
+var slices = 10; // the number of symmetric slices in each mandala 
+var bg = [0,0,0];
 var steps = 0;
+
+var total_shapes = 0;
+var shape_limit = 1000/slices;
+var umbrella_limit = 5;
 
 function setup() {        
      createCanvas(window.innerWidth, window.innerHeight);  
@@ -48,6 +52,8 @@ function mousePressed() {
         y: mouseY,
         d: 0,
         c: randColor(),
+        growth_rate: growth_rate,
+        death_rate: null,
         shapes: [],
         rotation: absmax(random(-0.02, 0.02), random(-0.02, 0.02)),
         selected: true
@@ -65,6 +71,25 @@ function mouseReleased() {
     });
 }
 
+function cleanup() {
+    umbrellas.forEach(function(u) {
+        if (u.death_rate) {
+            u.d -= u.death_rate;
+        }
+    });
+    if (total_shapes > shape_limit) {
+        var victim = _.sample(umbrellas);
+        victim.shapes = _.drop(victim.shapes, total_shapes - shape_limit);
+        total_shapes = shape_limit;
+    };
+    if (umbrellas.length > umbrella_limit) {
+        umbrellas[0].death_rate = growth_rate;
+        if (umbrellas[0].d < 0) {
+            umbrellas = _.drop(umbrellas);
+        };
+    };
+}
+
 function draw() {
     background(bg);
     var radians_per_slice = 2 * PI / slices;
@@ -76,20 +101,23 @@ function draw() {
             } else {
                 offset = 0;
             }
-            u.d += gr;
+            u.d += u.growth_rate;
             if (u.d % 5 === 0) {
                 u.shapes.push(createCircle(u.d, offset));
+                total_shapes += 1;
             }
             if (u.d % 3 === 0) {
                 u.shapes.push(createRectangle(u.d, offset));
+                total_shapes += 1;
             }
         }
         push()
             translate(u.x, u.y);
-            rotate(steps * u.rotation);
+            rotate(frameCount * u.rotation);
             drawUmbrella(u);
         pop();
     });
+    cleanup();
     steps += 1;
 }
 
