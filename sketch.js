@@ -1,7 +1,9 @@
 var umbrellas = [];
 var gr = 2; // growth rate 
 var slices = 5; // the number of symmetric slices in each mandala 
+var rotation_rpf = 0; // rotation in radians per frame
 var bg = [100,100,100];
+var steps = 0;
 
 function setup() {        
      createCanvas(window.innerWidth, window.innerHeight);  
@@ -50,8 +52,6 @@ function drawSlice(u) {
 }
 
 function drawUmbrella(u) {
-    push()
-    translate(u.x, u.y);
     fill(u.c);
     ellipse(0, 0, u.d);
     for (i=0; i<=slices; i++) {
@@ -60,7 +60,6 @@ function drawUmbrella(u) {
         drawSlice(u);
         pop();
     }
-    pop();
 }
 
 function mousePressed() {
@@ -114,8 +113,13 @@ function draw() {
                 })
             }
         }
-        drawUmbrella(u);
+        push()
+            translate(u.x, u.y);
+            rotate(steps * rotation_rpf);
+            drawUmbrella(u);
+        pop();
     });
+    steps += 1;
 }
 
 
