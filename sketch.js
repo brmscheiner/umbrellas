@@ -21,6 +21,10 @@ function drawSlice(u) {
         rotate(shape.offset);
         shape.drawFn(u.d);
         pop();
+        push();
+        rotate(-shape.offset);
+        shape.drawFn(u.d);
+        pop();
     });
 }
 
@@ -35,6 +39,10 @@ function drawUmbrella(u) {
     }
 }
 
+function absmax(a, b) {
+    return Math.abs(a) > Math.abs(b) ? a : b;
+}
+
 function mousePressed() {
     umbrellas.push({
         x: mouseX,
@@ -42,6 +50,7 @@ function mousePressed() {
         d: 0,
         c: randColor(),
         shapes: [],
+        rotation: absmax(random(-0.02, 0.02), random(-0.02, 0.02)),
         selected: true
     });
 }
@@ -62,7 +71,12 @@ function draw() {
     var radians_per_slice = 2 * PI / slices;
     umbrellas.forEach(function(u) {
         if (u.selected) {
-            var offset = random(-radians_per_slice/2, radians_per_slice/2);
+            var offset;
+            if (random() > 0.5) {
+                offset = random(radians_per_slice/2);
+            } else {
+                offset = 0;
+            }
             u.d += gr;
             if (u.d % 50 === 0) {
                 u.shapes.push(createCircle(u.d, offset));
@@ -73,7 +87,7 @@ function draw() {
         }
         push()
             translate(u.x, u.y);
-            rotate(steps * rotation_rpf);
+            rotate(steps * u.rotation);
             drawUmbrella(u);
         pop();
     });
