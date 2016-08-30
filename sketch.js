@@ -6,7 +6,8 @@ var steps = 0;
 
 var total_shapes = 0;
 var shape_limit = 1000/slices;
-var umbrella_limit = 5;
+var umbrella_limit = 1;
+var d_limit = 100;
 
 function setup() {        
      createCanvas(window.innerWidth, window.innerHeight);  
@@ -91,7 +92,7 @@ function cleanup() {
 }
 
 function draw() {
-    background(bg);
+    //background(bg);
     var radians_per_slice = 2 * PI / slices;
     umbrellas.forEach(function(u) {
         if (u.selected) {
@@ -101,12 +102,16 @@ function draw() {
             } else {
                 offset = 0;
             }
-            u.d += u.growth_rate;
-            if (u.d % 5 === 0) {
+            if (u.d < d_limit) {
+            	u.d += u.growth_rate;
+            } else {
+            	u.death_rate = u.growth_rate;
+            }
+            if (u.d % 2 === 0) {
                 u.shapes.push(createCircle(u.d, offset));
                 total_shapes += 1;
             }
-            if (u.d % 3 === 0) {
+            if (u.d % 5 === 0) {
                 u.shapes.push(createRectangle(u.d, offset));
                 total_shapes += 1;
             }
