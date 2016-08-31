@@ -5,9 +5,9 @@ var bg = [0,0,0];
 var steps = 0;
 
 var total_shapes = 0;
-var shape_limit = 1000/slices;
-var umbrella_limit = 1;
-var d_limit = 100;
+var shape_limit = 2000/slices;
+var umbrella_limit = 2;
+var d_limit = 660;
 
 function setup() {        
      createCanvas(window.innerWidth, window.innerHeight);  
@@ -73,11 +73,17 @@ function mouseReleased() {
 }
 
 function cleanup() {
-    umbrellas.forEach(function(u) {
+    var pruned_umbrellas = []
+    umbrellas.forEach(function(u, i) {
         if (u.death_rate) {
             u.d -= u.death_rate;
         }
+        if (u.d > 0) {
+            pruned_umbrellas.push(u);
+        }
     });
+    umbrellas = pruned_umbrellas;
+
     if (total_shapes > shape_limit) {
         var victim = _.sample(umbrellas);
         victim.shapes = _.drop(victim.shapes, total_shapes - shape_limit);
@@ -107,11 +113,11 @@ function draw() {
             } else {
             	u.death_rate = u.growth_rate;
             }
-            if (u.d % 2 === 0) {
+            if (u.d % 4 === 0) {
                 u.shapes.push(createCircle(u.d, offset));
                 total_shapes += 1;
             }
-            if (u.d % 5 === 0) {
+            if (u.d % 7 === 0) {
                 u.shapes.push(createRectangle(u.d, offset));
                 total_shapes += 1;
             }
